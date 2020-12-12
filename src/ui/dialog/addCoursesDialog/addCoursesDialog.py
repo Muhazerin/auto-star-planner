@@ -1,14 +1,8 @@
-from bs4 import BeautifulSoup
-import os
-from courses import (Course, Index, courseType, typeInfoEnum, Lecture, IndexInfo)
-
-import sys
-import window
-import addCourses
+from ui.dialog.addCoursesDialog import addCourses
+from model.index import (Index, typeIndexInfoEnum)
 
 from PyQt5.QtCore import (pyqtSignal, pyqtSlot)
-from PyQt5.QtGui import (QFont, QTextCharFormat)
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QDialog, QMessageBox, QLabel)
+from PyQt5.QtWidgets import (QDialog, QMessageBox)
 
 class AddCourses(QDialog, addCourses.Ui_dialog):    
     lecInfo = pyqtSignal(int, list, str)
@@ -159,7 +153,7 @@ class AddCourses(QDialog, addCourses.Ui_dialog):
             for nextIndex in index.next:
                 clash = False
                 for nextIndexInfo in nextIndex.indexInfoList:
-                    if nextIndexInfo.indexInfoType == typeInfoEnum.TUT:
+                    if nextIndexInfo.indexInfoType == typeIndexInfoEnum.TUT:
                         if (self.gotClash(self.getColIndex(nextIndexInfo.day), self.getRowRangeIndex(nextIndexInfo.time))):
                             clash = True
                             break
@@ -176,14 +170,14 @@ class AddCourses(QDialog, addCourses.Ui_dialog):
 
     def tempMarkDayTime(self, index):
         for indexInfo in index.indexInfoList:
-            if indexInfo.indexInfoType == typeInfoEnum.TUT:
+            if indexInfo.indexInfoType == typeIndexInfoEnum.TUT:
                 self.setOnArray(self.getColIndex(indexInfo.day), self.getRowRangeIndex(indexInfo.time))
             else:
                 self.setOnArrayForLab(self.getColIndex(indexInfo.day), self.getRowRangeIndex(indexInfo.time), indexInfo.remarks)
     
     def unmarkDayTime(self, index):
         for indexInfo in index.indexInfoList:
-            if indexInfo.indexInfoType == typeInfoEnum.TUT:
+            if indexInfo.indexInfoType == typeIndexInfoEnum.TUT:
                 self.unsetArray(self.getColIndex(indexInfo.day), self.getRowRangeIndex(indexInfo.time))
             else:
                 self.unsetArrayForLab(self.getColIndex(indexInfo.day), self.getRowRangeIndex(indexInfo.time), indexInfo.remarks)
@@ -284,208 +278,3 @@ class AddCourses(QDialog, addCourses.Ui_dialog):
             if self.dayTime[row][col] == 1:
                 return True
         return False
-
-class Window(QMainWindow, window.Ui_MainWindow):
-    def __init__(self):
-        super(Window, self).__init__()
-        self.courseList = []
-        self.lastPlanSpinBoxValue = None
-        self.currentPlanSpinBoxValue = None
-
-        self.setupUi(self)
-        self.overviewLbl.hide()
-        self.planSpinBox.setEnabled(False)
-        self.planSpinBox.valueChanged.connect(self.onPlanValueChanged)
-        self.addCoursesDialog = AddCourses()
-        self.addCoursesDialog.lecInfo.connect(self.on_lecInfo_emitted)
-        self.addCoursesDialog.donePlanning.connect(self.on_donePlanning_emitted)
-        self.actionAdd_Courses.setEnabled(False)
-
-        self.actionLoad_Class_Schedule.triggered.connect(self.loadClassSchedule)
-        self.actionAdd_Courses.triggered.connect(self.openAddCoursesDialog)
-
-    def onPlanValueChanged(self, newValue):
-        if newValue != 0:
-            self.lastPlanSpinBoxValue = self.currentPlanSpinBoxValue
-            self.currentPlanSpinBoxValue = newValue
-            if self.lastPlanSpinBoxValue:
-                self.clearOldTable(self.lastPlanSpinBoxValue)
-            self.setNewTable(newValue)
-            self.setOverview(newValue)
-            
-
-    def setOverview(self, newValue):
-        plan = self.addCoursesDialog.potentialPlan[newValue - 1]
-        text = ""
-        for i in range(len(plan)):
-            text += f"{self.addCoursesDialog.selectedCourse[i].courseCode}: {plan[i].indexNo}          "
-        self.overviewLbl.setText(text)
-        self.overviewLbl.show()
-
-    def clearOldTable(self, oldValue):
-        plan = self.addCoursesDialog.potentialPlan[oldValue - 1]
-        for i in range(len(plan)):
-            for index in self.addCoursesDialog.selectedCourse[i].indexList: # loop all the indexes for that course
-                if index.indexNo == plan[i].indexNo:    # if both indexes are the same
-                    for indexInfo in index.indexInfoList:   # get the index info
-                        rowRange = self.addCoursesDialog.getRowRangeIndex(indexInfo.time)
-                        col = self.addCoursesDialog.getColIndex(indexInfo.day)
-                        for row in range(rowRange[0], rowRange[1]):
-                            if self.plannerTable.cellWidget(row, col):  # if there's a value in that cell
-                                self.plannerTable.setCellWidget(row, col, None) # remove it
-
-    def setNewTable(self, newValue):
-        plan = self.addCoursesDialog.potentialPlan[newValue - 1]
-        for i in range(len(plan)):
-            for index in self.addCoursesDialog.selectedCourse[i].indexList: # loop all the indexes for that course
-                if index.indexNo == plan[i].indexNo:    # if both indexes are the same
-                    for indexInfo in index.indexInfoList:   # get the index info
-                        rowRange = self.addCoursesDialog.getRowRangeIndex(indexInfo.time)
-                        col = self.addCoursesDialog.getColIndex(indexInfo.day)
-                        if indexInfo.indexInfoType == typeInfoEnum.TUT: # separate algo for TUT and LAB
-                            for row in range(rowRange[0], rowRange[1]):
-                                tempLabel = QLabel(f"{self.addCoursesDialog.selectedCourse[i].courseCode} TUT")
-                                tempLabel.setStyleSheet("background-color: springgreen; font-family: Arial; font-size: 22px")
-                                self.plannerTable.setCellWidget(row, col, tempLabel)
-                        else:   # LAB algo
-                            for row in range(rowRange[0], rowRange[1]):
-                                if (self.plannerTable.cellWidget(row, col)):  # if there's some value existing in that cell
-                                    text = self.plannerTable.cellWidget(row, col).text()
-                                    text += f"\n{self.addCoursesDialog.selectedCourse[i].courseCode} LAB {indexInfo.remarks}"
-                                    tempLabel = QLabel(text)
-                                    tempLabel.setStyleSheet("background-color: salmon; font-family: Arial; font-size: 22px")
-                                    self.plannerTable.setCellWidget(row, col, tempLabel)
-                                else:   # there's no value in that cell
-                                    tempLabel = QLabel(f"{self.addCoursesDialog.selectedCourse[i].courseCode} LAB {indexInfo.remarks}")
-                                    tempLabel.setStyleSheet("background-color: salmon; font-family: Arial; font-size: 22px")
-                                    self.plannerTable.setCellWidget(row, col, tempLabel)
-
-    @pyqtSlot()
-    def on_donePlanning_emitted(self):
-        if self.addCoursesDialog.potentialPlan:
-            self.planSpinBox.setEnabled(True)
-            self.planSpinBox.setMaximum(len(self.addCoursesDialog.potentialPlan))
-            self.planSpinBox.setValue(1)
-            self.planSpinBox.setMinimum(1)
-
-    @pyqtSlot(int, list, str)
-    def on_lecInfo_emitted(self, col, rowRange, info):
-        for row in range(rowRange[0], rowRange[1]):
-            tempLabel = QLabel(info)
-            tempLabel.setStyleSheet("background-color: lightskyblue; font-family: Arial; font-size: 22px")
-            self.plannerTable.setCellWidget(row, col, tempLabel)
-
-    def duplCourse(self, name):
-        for course in self.courseList:
-            if name == course.courseCode:
-                return True
-        return False
-
-    def retrieveCourses(self, soup):
-        i = 0
-        dupl = False
-        for table in soup("table"):
-            if i % 2 == 0:
-                if not self.duplCourse("".join(table.font.findAll(text=True))):
-                    self.courseList.append(Course("".join(table.font.findAll(text=True))))
-                else:
-                    dupl = True
-            if i % 2 == 1:
-                if not dupl:
-                    self.retrieveIndexes(table, self.courseList[-1])
-                else:
-                    dupl = False
-            i += 1
-
-    def retrieveIndexes(self, table, course):
-        courseInfoSet = gotLec = gotLab = False
-        first = True
-        col = 0 # the table only has 7 columns
-        typeInfo = None
-        
-        for item in table("td"):
-            if col % 7 == 0:  # Index
-                indexNo = "".join(item.findAll(text=True))
-                if indexNo:   # if indexNo is not empty
-                    if first:
-                        first = False
-                        index = Index(indexNo)
-                    else:   # this is the second index onwards
-                        course.indexList.append(index)
-                        index = Index(indexNo)
-                        if not courseInfoSet:
-                            if gotLec and gotLab:
-                                course.type = courseType.LECTUTLAB
-                            elif gotLec and not gotLab:
-                                course.type = courseType.LECTUT
-                            else:
-                                course.type = courseType.TUT
-                            courseInfoSet = True
-            if col % 7 == 1:  # Type: (blank(for online courses), LEC/STUDIO, TUT, LAB)
-                if "".join(item.findAll(text=True)) == "LEC/STUDIO":
-                    gotLec = True
-                    typeInfo = typeInfoEnum.LEC
-                elif "".join(item.findAll(text=True)) == "TUT":
-                    typeInfo = typeInfoEnum.TUT
-                elif "".join(item.findAll(text=True)) == "LAB":
-                    gotLab = True
-                    typeInfo = typeInfoEnum.LAB
-            if col % 7 == 3:  # Day: (MON, TUE, WED, THU, FRI)
-                day = "".join(item.findAll(text=True))
-            if col % 7 == 4:  # Time
-                time = "".join(item.findAll(text=True))
-                if typeInfo:
-                    if typeInfo == typeInfoEnum.LEC and not courseInfoSet:
-                        course.lecList.append(Lecture(day, time))
-                    elif typeInfo == typeInfoEnum.TUT:
-                        index.indexInfoList.append(IndexInfo(day, time, typeInfoEnum.TUT))
-            if col % 7 == 6:  # Remarks: (blank, Teaching Wk(tut and lab got its own teaching week), Online Course)
-                if "".join(item.findAll(text=True)) == "Online Course":
-                    courseInfoSet = True
-                    course.type = courseType.ONLINE
-                elif "".join(item.findAll(text=True)) == "Teaching Wk2,4,6,8,10,12":
-                    index.indexInfoList.append(IndexInfo(day, time, typeInfoEnum.LAB))
-                    index.indexInfoList[-1].remarks = "Even"
-                elif "".join(item.findAll(text=True)) == "Teaching Wk1,3,5,7,9,11,13":
-                    index.indexInfoList.append(IndexInfo(day, time, typeInfoEnum.LAB))
-                    index.indexInfoList[-1].remarks = "Odd"
-                elif course.courseCode == "CZ3004":
-                    index.indexInfoList.append(IndexInfo(day, time, typeInfoEnum.LAB))
-                    index.indexInfoList[-1].remarks = "MDP"
-            col += 1
-        course.indexList.append(index)  # this is to add the last index as the algo only add the index at the next index
-
-    def clearTable(self):
-        self.overviewLbl.hide()
-        for row in range(self.plannerTable.rowCount()):
-            for col in range(self.plannerTable.columnCount()):
-                self.plannerTable.setCellWidget(row, col, None)
-
-    def loadClassSchedule(self):
-        self.actionAdd_Courses.setEnabled(True)
-        self.planSpinBox.setEnabled(False)
-        self.planSpinBox.setMinimum(0)
-        self.planSpinBox.setMaximum(0)
-        self.clearTable()
-        self.courseList.clear
-        for fileName in os.listdir("classSchedule"):
-            with open(os.path.join("classSchedule", fileName), 'r') as f:
-                content = f.read()
-                soup = BeautifulSoup(content, "html.parser")
-                self.retrieveCourses(soup)
-        self.addCoursesDialog.courseList = self.courseList
-        self.actionLoad_Class_Schedule.setText("Reload Class Schedule")
-        QMessageBox.information(self, "Load Class Schedule", f"{len(self.courseList)} class schedules loaded.")
-
-    def openAddCoursesDialog(self):
-        self.actionAdd_Courses.setEnabled(False)
-        self.addCoursesDialog.show()
-
-def main():
-    app = QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()

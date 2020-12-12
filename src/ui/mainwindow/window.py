@@ -132,19 +132,10 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1061, 18))
         self.menubar.setObjectName("menubar")
-        self.menuFile = QtWidgets.QMenu(self.menubar)
-        self.menuFile.setObjectName("menuFile")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.actionLoad_Class_Schedule = QtWidgets.QAction(MainWindow)
-        self.actionLoad_Class_Schedule.setObjectName("actionLoad_Class_Schedule")
-        self.actionAdd_Courses = QtWidgets.QAction(MainWindow)
-        self.actionAdd_Courses.setObjectName("actionAdd_Courses")
-        self.menuFile.addAction(self.actionLoad_Class_Schedule)
-        self.menuFile.addAction(self.actionAdd_Courses)
-        self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -228,7 +219,4 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Saturday"))
         self.overviewLbl.setText(_translate("MainWindow", "Sample"))
         self.planLbl.setText(_translate("MainWindow", "Plan: "))
-        self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.actionLoad_Class_Schedule.setText(_translate("MainWindow", "Load Class Schedule"))
-        self.actionAdd_Courses.setText(_translate("MainWindow", "Add Courses"))
-import resources_rc
+import res.resources_rc

@@ -42,4 +42,4 @@ class Ui_dialog(object):
         dialog.setWindowTitle(_translate("dialog", "Add Course"))
         self.coursesLbl.setText(_translate("dialog", "Courses: "))
         self.planBtn.setText(_translate("dialog", "Check"))
-import resources_rc
+import res.resources_rc
