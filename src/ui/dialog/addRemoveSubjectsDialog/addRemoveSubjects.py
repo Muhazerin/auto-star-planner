@@ -110,6 +110,7 @@ class Dialog(QDialog, addRemoveSubjectsDialog.Ui_AddRemoveSubject):
                 for subject in self.__subjectList:
                     self.subjectListWidget.addItem(f'{subject.courseCode}: {subject.courseName}')
                 self.subjectListWidget.setMinimumWidth(self.subjectListWidget.sizeHintForColumn(0))
+            QMessageBox.information(self, self.getWindowName(), f'Finished loading subjects for {currentText}')
 
     # Returns the self.__courseYear key according to the value
     def getCourseYearKey(self, val):

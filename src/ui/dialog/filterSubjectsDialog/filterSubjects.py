@@ -13,62 +13,61 @@ class Dialog(QDialog, filterSubjectsDialog.Ui_filterSubjectsDialog):
         self.__mainPotentialPlanCopy = None
 
         self.__comboBoxList = []
+        self.__tempFilteredPlan = []
         self.setupUi(self)
         self.applyFilterBtn.clicked.connect(self.applyFilterBtnClicked)
         self.clearFilterBtn.clicked.connect(self.clearFilterBtnClicked)
 
     def applyFilterBtnClicked(self):
-        self.filterTypeComboBox.setEnabled(False)
-        for comboBox in self.__comboBoxList:
-            comboBox.setEnabled(False)
-        self.applyFilterBtn.setEnabled(False)
-        self.clearFilterBtn.setEnabled(True)
-        self.applyFilter()
-
-    def applyFilter(self):
-        subjectIndex = self.getSubjectIndex()
         tempPlanList = []
-        if self.filterTypeComboBox.currentText() == 'Blacklist':
-            if self.__comboBoxList[subjectIndex].count() == 2:
-                QMessageBox.critical(self, self.getWindowName(), "Dude! This is the only index.\nRemove the subject la")
-                return
-            for tempPlan in self.__mainPotentialPlanCopy.potentialPlan:
-                if tempPlan[subjectIndex].indexNo != self.__comboBoxList[subjectIndex].currentText():
-                    tempPlanList.append(tempPlan.copy())
-        else:
-            for tempPlan in self.__mainPotentialPlanCopy.potentialPlan:
-                if tempPlan[subjectIndex].indexNo == self.__comboBoxList[subjectIndex].currentText():
-                    tempPlanList.append(tempPlan.copy())
-        self.__mainPotentialPlan.whoMadeTheChange = self.getWindowName()
-        self.__mainPotentialPlan.subjectList = self.__mainPotentialPlanCopy.subjectList
-        self.__mainPotentialPlan.potentialPlan = tempPlanList
-        self.done(0)
 
-    # Returns the index from self.__comboList where the current index != 0
-    # Returns -1 if invalid
-    def getSubjectIndex(self):
+        # An attempt to make multi-level filtering
+        self.clearFilterBtn.setEnabled(True)
+        gotFilter = False
+        first = True
+
         for i in range(len(self.__comboBoxList)):
             if self.__comboBoxList[i].currentIndex() != 0:
-                return i
-        return -1
+                gotFilter = True
+                if first:
+                    first = False
+                    tempPlanList = self.filterPlan(i, self.__comboBoxList[i].currentText(), self.__mainPotentialPlanCopy.potentialPlan)
+                else:
+                    tempPlanList = self.filterPlan(i, self.__comboBoxList[i].currentText(), tempPlanList)
+
+        if len(tempPlanList) == 0 and gotFilter:
+            QMessageBox.critical(self, self.getWindowName(), 'Unable to plan with the current filter')
+            return
+
+        if not gotFilter:     # If there is no filter applied and the user pressed the apply button
+            tempPlanList = self.__mainPotentialPlanCopy.potentialPlan
+            self.clearFilterBtn.setEnabled(False)
+
+        self.__mainPotentialPlan.potentialPlan = tempPlanList
+        self.__mainPotentialPlan.whoMadeTheChange = self.getWindowName()
+        self.__mainPotentialPlan.subjectList = self.__mainPotentialPlanCopy.subjectList
+        self.done(0)
+
+    def filterPlan(self, subjectIndex, indexNo, tempPlanList):
+        tempPlanList2 = []
+        for tempPlan in tempPlanList:
+            if tempPlan[subjectIndex].indexNo == indexNo:
+                tempPlanList2.append(tempPlan.copy())
+        return tempPlanList2
 
     def clearFilterBtnClicked(self):
-        self.filterTypeComboBox.setEnabled(True)
-        for comboBox in self.__comboBoxList:
-            comboBox.setEnabled(True)
         self.applyFilterBtn.setEnabled(True)
         self.clearFilterBtn.setEnabled(False)
 
-        self.resetUi()
-        self.__comboBoxList.clear()
         for i in range(len(self.__mainPotentialPlanCopy.subjectList)):
-            self.__comboBoxList.append(self.createComboBox(i))
-            self.__comboBoxList[-1].currentIndexChanged.connect(self.comboBoxIndexChanged)
-            self.dialogFormLayout.insertRow(i + 1, QLabel(str(self.__mainPotentialPlanCopy.subjectList[i].courseCode) + ': '), self.__comboBoxList[-1])
+            self.__comboBoxList[i].clear()
+            self.__comboBoxList[i].addItem('Choose an index')
+            for tempPlan in self.__mainPotentialPlanCopy.potentialPlan:
+                if self.__comboBoxList[i].findText(str(tempPlan[i].indexNo)) == -1:
+                    self.__comboBoxList[i].addItem(str(tempPlan[i].indexNo))
         self.__mainPotentialPlan.whoMadeTheChange = self.getWindowName()
         self.__mainPotentialPlan.potentialPlan = self.__mainPotentialPlanCopy.potentialPlan
         self.__mainPotentialPlan.subjectList = self.__mainPotentialPlanCopy.subjectList
-
 
     def updatePlan(self):
         if self.__mainPotentialPlan.whoMadeTheChange == 'Add/Remove Subjects':
@@ -77,9 +76,9 @@ class Dialog(QDialog, filterSubjectsDialog.Ui_filterSubjectsDialog):
             self.__mainPotentialPlanCopy = potentialPlanCopy.PotentialPlanCopy(self.__mainPotentialPlan)
             self.__comboBoxList.clear()
             for i in range(len(self.__mainPotentialPlanCopy.subjectList)):
-                self.__comboBoxList.append(self.createComboBox(i))
-                self.__comboBoxList[-1].currentIndexChanged.connect(self.comboBoxIndexChanged)
-                self.dialogFormLayout.insertRow(i+1, QLabel(str(self.__mainPotentialPlanCopy.subjectList[i].courseCode)+': '), self.__comboBoxList[-1])
+                self.__comboBoxList.append(self.createComboBox(i, self.__mainPotentialPlanCopy.potentialPlan))
+                # self.__comboBoxList[-1].currentIndexChanged.connect(self.comboBoxIndexChanged)
+                self.dialogFormLayout.insertRow(i, QLabel(str(self.__mainPotentialPlanCopy.subjectList[i].courseCode)+': '), self.__comboBoxList[-1])
 
     # SLOT: Called when any comboBox in self.__comboBoxList change index
     def comboBoxIndexChanged(self, currentIndex):
@@ -93,17 +92,17 @@ class Dialog(QDialog, filterSubjectsDialog.Ui_filterSubjectsDialog):
 
     # Reset the ui to the default state
     def resetUi(self):
-        for i in range(self.dialogFormLayout.rowCount() - 2):
-            self.dialogFormLayout.removeRow(1)
+        for i in range(self.dialogFormLayout.rowCount() - 1):
+            self.dialogFormLayout.removeRow(0)
 
     # Create the combo box for updatePlan function
-    def createComboBox(self, subjectIndex):
+    def createComboBox(self, subjectIndex, tempPlanList):
         tempComboBox = QComboBox(self)
         tempComboBox.addItem("Choose an index")
-        for i in range(len(self.__mainPotentialPlanCopy.potentialPlan)):
-            if tempComboBox.findText(str(self.__mainPotentialPlanCopy.potentialPlan[i][subjectIndex].indexNo)) == -1:
+        for i in range(len(tempPlanList)):
+            if tempComboBox.findText(str(tempPlanList[i][subjectIndex].indexNo)) == -1:
                 # The text does not exist in the combo box
-                tempComboBox.addItem(str(self.__mainPotentialPlanCopy.potentialPlan[i][subjectIndex].indexNo))
+                tempComboBox.addItem(str(tempPlanList[i][subjectIndex].indexNo))
         return tempComboBox
 
     def getWindowName(self):
