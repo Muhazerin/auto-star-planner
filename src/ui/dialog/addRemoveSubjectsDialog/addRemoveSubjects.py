@@ -8,52 +8,52 @@ import sys
 #  When I go to SCSE Year 3 list, I can add the same subject
 
 class Dialog(QDialog, addRemoveSubjectsDialog.Ui_AddRemoveSubject):
+    # Initialize some variables
+    # Setup the ui
     def __init__(self, mainPotentialPlan):
         super(Dialog, self).__init__()
         self.__mainPotentialPlan = mainPotentialPlan
         self.__addedSubjectsList = []
-        self.setupUi(self)
-
         self.__dayDict = {
-            "MON":0,
-            "TUE":1,
-            "WED":2,
-            "THU":3,
-            "FRI":4,
-            "SAT":5,
+            "MON": 0,
+            "TUE": 1,
+            "WED": 2,
+            "THU": 3,
+            "FRI": 4,
+            "SAT": 5,
         }
         self.__timeDict = {
-            "0800":0,
-            "0830":1,
-            "0900":2,
-            "0930":3,
-            "1000":4,
-            "1030":5,
-            "1100":6,
-            "1130":7,
-            "1200":8,
-            "1230":9,
-            "1300":10,
-            "1330":11,
-            "1400":12,
-            "1430":13,
-            "1500":14,
-            "1530":15,
-            "1600":16,
-            "1630":17,
-            "1700":18,
-            "1730":19,
-            "1800":20,
-            "1830":21,
-            "1900":22,
-            "1930":23,
-            "2000":24,
-            "2030":25,
-            "2100":26,
-            "2130":27,
-            "2200":28,
-            "2230":29,
-            "2300":30,
+            "0800": 0,
+            "0830": 1,
+            "0900": 2,
+            "0930": 3,
+            "1000": 4,
+            "1030": 5,
+            "1100": 6,
+            "1130": 7,
+            "1200": 8,
+            "1230": 9,
+            "1300": 10,
+            "1330": 11,
+            "1400": 12,
+            "1430": 13,
+            "1500": 14,
+            "1530": 15,
+            "1600": 16,
+            "1630": 17,
+            "1700": 18,
+            "1730": 19,
+            "1800": 20,
+            "1830": 21,
+            "1900": 22,
+            "1930": 23,
+            "2000": 24,
+            "2030": 25,
+            "2100": 26,
+            "2130": 27,
+            "2200": 28,
+            "2230": 29,
+            "2300": 30,
         }
 
         self.__potentialPlan = []
@@ -61,7 +61,10 @@ class Dialog(QDialog, addRemoveSubjectsDialog.Ui_AddRemoveSubject):
         self.__dayTimeEvenOdd = []
         for i in range(0, 31):
             self.__dayTime.append([0] * 6)
-            self.__dayTimeEvenOdd.append(["NIL"] * 6)     # NIL, A = All week, E = Even week, O = Odd Week, EO = Even and Odd Week
+            self.__dayTimeEvenOdd.append(
+                ["NIL"] * 6)  # NIL, A = All week, E = Even week, O = Odd Week, EO = Even and Odd Week
+
+        self.setupUi(self)
 
         self.__courseYear = datasource.loadCourseYears()
         self.loadCourseYears()
@@ -325,6 +328,9 @@ class Dialog(QDialog, addRemoveSubjectsDialog.Ui_AddRemoveSubject):
         return [self.__timeDict.get(time.split('-')[0]), self.__timeDict.get(time.split('-')[1])]
 
     # The many potential plan functions end here
+
+    def showErrorMsg(self, errorMsg):
+        QMessageBox.critical(self, self.getWindowName(), errorMsg)
 
     def updatePlan(self):
         pass
