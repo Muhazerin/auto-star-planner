@@ -1,4 +1,5 @@
-from ui.dialog.filterSubjectsDialog import (filterSubjectsDialog, potentialPlanCopy)
+from ui.dialog.filterSubjectsDialog import filterSubjectsDialog
+from ui.dialog.filterSubjectsDialog.model import potentialPlanCopy
 
 from PyQt5.QtWidgets import (QDialog, QLabel, QComboBox, QMessageBox)
 

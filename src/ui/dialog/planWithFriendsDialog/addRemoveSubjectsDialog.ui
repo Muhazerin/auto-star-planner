@@ -17,7 +17,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Add/Remove Subjects</string>
+   <string>Add/Remove Subjects (Plan with Friends)</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../../res/resources.qrc">
@@ -27,13 +27,23 @@
    <item>
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
+      <widget class="QLabel" name="nameLbl">
+       <property name="text">
+        <string>Name:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nameLineEdit"/>
+     </item>
+     <item row="1" column="0">
       <widget class="QLabel" name="courseYearLbl">
        <property name="text">
         <string>Course, Year: </string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item row="1" column="1">
       <widget class="QComboBox" name="courseYearComboBox"/>
      </item>
     </layout>
@@ -117,12 +127,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="planBtn">
+      <widget class="QPushButton" name="submitBtn">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Plan</string>
+        <string>Submit</string>
        </property>
       </widget>
      </item>

@@ -1,4 +1,4 @@
-from ui.dialog.filterSubjectsDialog import indexCopy
+from ui.dialog.filterSubjectsDialog.model import indexCopy
 
 class SubjectCopy:
     def __init__(self, tempSubject):

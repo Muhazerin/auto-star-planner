@@ -1,4 +1,4 @@
-from ui.dialog.filterSubjectsDialog import (subjectCopy, indexCopy)
+from ui.dialog.planWithFriendsDialog.model import (subjectCopy, indexCopy)
 
 class PotentialPlanCopy:
     def __init__(self, mainPotentialPlan):
