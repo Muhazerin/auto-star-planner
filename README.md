@@ -4,7 +4,7 @@ Why take 1 hour to plan your semester when someone took more than 1 week to auto
 ![](https://i.imgur.com/iBGLqNN.gif)
 
 ## About the project
-The project is separated in different modules. The bare skeleton of the project (without the modules) is simple mainwindow 
+The project is separated into different modules. The bare skeleton of the project (without the modules) is simple mainwindow 
 ![](https://i.imgur.com/ZuSmVFT.png)
 This way, each dialog can be independent from other dialogs. This makes it easier to add more functionalities to the application in the future.   
 All the possible timetable(plan) is communicated across different dialog via the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern). The plan is the subject and the dialogs are the observer.  
