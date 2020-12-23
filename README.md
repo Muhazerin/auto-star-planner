@@ -27,7 +27,7 @@ pip install beautifulsoup4
 
 ## Source Code
 The source code can be found in the src folder.  
-The entry point of the application is main.py in the src folder
+The entry point of the application is app.py in the src folder
 
 ## Attributes
 Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
