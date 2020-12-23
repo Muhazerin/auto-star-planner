@@ -6,8 +6,8 @@ Why take 1 hour to plan your semester when someone took more than 1 week to auto
 ## About the project
 The project is separated into different modules. The bare skeleton of the project (without the modules) is simple mainwindow 
 ![](https://i.imgur.com/ZuSmVFT.png)
-This way, each dialog can be independent from other dialogs. This makes it easier to add more functionalities to the application in the future.   
-All the possible timetable(plan) is communicated across different dialog via the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern). The plan is the subject and the dialogs are the observer.  
+This way, each module can be independent from other modules. This makes it easier to add more functionalities to the application in the future.   
+All the possible timetable(plan) is communicated across different modules via the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern). The plan is the subject and the modules are the observer.  
 ### Modules
 * [Add/Remove Subjects](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/addRemoveSubjectsDialog)  
     * This module enables the user to add and remove subjects   
