@@ -9,11 +9,19 @@ The project is separated into different modules. The bare skeleton of the projec
 This way, each module can be independent from other modules. This makes it easier to add more functionalities to the application in the future.   
 All the possible timetable(plan) is communicated across different modules via the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern). The plan is the subject and the modules are the observer.  
 ### Modules
+If loaded successfully, the modules will appear in the "Extension" tab  
 * [Add/Remove Subjects](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/addRemoveSubjectsDialog)  
     * This module enables the user to add and remove subjects   
   
 * [Filter Subjects](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/filterSubjectsDialog)  
     * This module enables the user to filter each subjects to a specific index
+### Tips for creating new module
+The module are to be created with pyqt  
+1. Place your exampleModule.py inside exampleModuleDialog folder
+2. Inside your exampleModule.py, you will need,
+    1. A class called Dialog, taking mainPotentialPlan as parameter
+    2. updatePlan() method
+    3. getWindowName() method
 
 ## Project Setup
 ### Requirements
