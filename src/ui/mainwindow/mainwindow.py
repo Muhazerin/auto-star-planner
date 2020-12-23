@@ -122,6 +122,7 @@ class Window(QMainWindow, window.Ui_MainWindow):
             # Setup the ui for planSpinBox and totalPlanLbl
             self.planSpinBox.setMinimum(1)
             self.planSpinBox.setValue(1)    # This should call the onPlanValueChanged function
+            self.onPlanValueChanged(1)      # But it will not be called if the value change from 1 to 1 (different plan)
             self.planSpinBox.setMaximum(len(self.mainPotentialPlan.potentialPlan))
             self.planSpinBox.setEnabled(True)
             self.totalPlanLbl.setText(f'{len(self.mainPotentialPlan.potentialPlan)}')
