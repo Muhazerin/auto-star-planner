@@ -9,9 +9,10 @@ The project is separated in different modules. The bare skeleton of the project 
 This way, each dialog can be independent from other dialogs. This makes it easier to add more functionalities to the application in the future.   
 All the possible timetable(plan) is communicated across different dialog via the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern). The plan is the subject and the dialogs are the observer.  
 ### Modules
-####[Add/Remove Subjects](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/addRemoveSubjectsDialog)  
-This module enables the user to add and remove subjects
-####[Filter Subjects](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/filterSubjectsDialog)
+[Add/Remove Subjects](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/addRemoveSubjectsDialog)  
+This module enables the user to add and remove subjects   
+  
+[Filter Subjects](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/filterSubjectsDialog)  
 This module enables the user to filter each subjects to a specific index
 
 ## Project Setup
