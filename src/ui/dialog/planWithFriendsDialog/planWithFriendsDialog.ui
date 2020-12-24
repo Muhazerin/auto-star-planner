@@ -39,12 +39,12 @@
       <widget class="QListWidget" name="friendListWidget"/>
      </item>
      <item>
-      <widget class="QPushButton" name="viewFriendCourseBtn">
+      <widget class="QPushButton" name="viewFriendPlanBtn">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>View Friend's Course</string>
+        <string>View Friend's Plan</string>
        </property>
       </widget>
      </item>
@@ -61,25 +61,11 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="addFriendBtn">
-       <property name="text">
-        <string>Add Friend</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="planButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Plan</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QPushButton" name="addFriendBtn">
+     <property name="text">
+      <string>Add Friend</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

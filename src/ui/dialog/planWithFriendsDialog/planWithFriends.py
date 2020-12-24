@@ -2,6 +2,7 @@ from ui.dialog.planWithFriendsDialog import (planWithFriendsDialog, addRemoveSub
 from ui.dialog.planWithFriendsDialog.model import (potentialPlanCopy, friends)
 
 from PyQt5.QtWidgets import (QDialog, QMessageBox)
+from PyQt5.QtCore import pyqtSlot
 
 class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
     def __init__(self, mainPotentialPlan):
@@ -17,11 +18,20 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
 
             self.setupUi(self)
             self.addFriendBtn.clicked.connect(self.addFriendBtnClicked)
+            self.__addRemoveSubjects.newFriendSignal.connect(self.plan)
         except Exception as err:
             self.showErrorMsg(f'planWithFriends::__init__():\nError msg: {err}')
 
+    # Called everytime addFriendBtn is clicked
+    # Opens the dialog for the user to add friend and their subjects
+    @pyqtSlot()
     def addFriendBtnClicked(self):
+        self.__addRemoveSubjects.resetUi()
         self.__addRemoveSubjects.exec()
+
+    @pyqtSlot(friends.Friend)
+    def plan(self):
+        print('planWithFriends::plan() ran')
 
     def updatePlan(self):
         try:
