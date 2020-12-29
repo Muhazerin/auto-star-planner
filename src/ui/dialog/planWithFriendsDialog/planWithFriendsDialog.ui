@@ -62,6 +62,12 @@
    </item>
    <item>
     <widget class="QPushButton" name="addFriendBtn">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Add Friend</string>
      </property>

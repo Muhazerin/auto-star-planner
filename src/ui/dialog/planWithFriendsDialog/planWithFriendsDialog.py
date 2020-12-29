@@ -38,6 +38,10 @@ class Ui_planWithFriendsDialog(object):
         self.horizontalLayout_2.addWidget(self.deleteFriendBtn)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.addFriendBtn = QtWidgets.QPushButton(planWithFriendsDialog)
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        self.addFriendBtn.setFont(font)
         self.addFriendBtn.setObjectName("addFriendBtn")
         self.verticalLayout.addWidget(self.addFriendBtn)
 

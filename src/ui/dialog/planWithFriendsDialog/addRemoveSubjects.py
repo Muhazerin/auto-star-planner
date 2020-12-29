@@ -1,19 +1,22 @@
 from ui.dialog.planWithFriendsDialog import addRemoveSubjectsDialog
 from ui.dialog.planWithFriendsDialog.model import friends
 from datasource import datasource
-from model import (course, index)
+from model import (course, index, potentialPlan)
 
 import sys
 from PyQt5.QtWidgets import (QDialog, QMessageBox)
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal)
 
 class Dialog(QDialog, addRemoveSubjectsDialog.Ui_AddRemoveSubject):
-    newFriendSignal = pyqtSignal(friends.Friend)
+    newFriendSignal = pyqtSignal(friends.Friend, potentialPlan.PotentialPlan)
     def __init__(self):
         try:
             super(Dialog, self).__init__()
             self.__subjectList = []
+
             self.__addedSubjectsList = []
+            self.__potentialPlan = []
+
             self.__dayDict = {
                 "MON": 0,
                 "TUE": 1,
@@ -55,6 +58,13 @@ class Dialog(QDialog, addRemoveSubjectsDialog.Ui_AddRemoveSubject):
                 "2230": 29,
                 "2300": 30,
             }  # Dictionary to translate time to index
+
+            self.__dayTime = []  # Used to temporarily mark dayTime for planning
+            self.__dayTimeEvenOdd = []  # Used to temporarily mark dayTime for lab planning
+            for i in range(0, 31):
+                self.__dayTime.append([0] * 6)
+                self.__dayTimeEvenOdd.append(
+                    ["NIL"] * 6)  # NIL, A = All week, E = Even week, O = Odd Week, EO = Even and Odd Week
 
             self.setupUi(self)
 
@@ -221,8 +231,179 @@ class Dialog(QDialog, addRemoveSubjectsDialog.Ui_AddRemoveSubject):
     # Close this dialog
     @pyqtSlot()
     def submitBtnClicked(self):
-        self.newFriendSignal.emit(friends.Friend(self.nameLineEdit.text(), self.__addedSubjectsList))
-        self.done(0)
+        try:
+            tempPotentialPlan = potentialPlan.PotentialPlan()
+            self.__potentialPlan.clear()
+            self.createIndexGraph()
+
+            self.dfsMain()
+
+            # Check the potentialPlan
+            if len(self.__potentialPlan) > 0:
+                tempPotentialPlan.subjectList = self.__addedSubjectsList
+                tempPotentialPlan.potentialPlan = self.__potentialPlan
+
+                self.newFriendSignal.emit(friends.Friend(self.nameLineEdit.text(), self.__addedSubjectsList), tempPotentialPlan)
+                self.done(0)
+            else:
+                self.show('Unable to plan your friend\'s semester with these setup')
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::submitBtnClicked()\nError msg: {err}')
+
+    # Create an index graph
+    # All the index of 1 course points to all indexes of another course
+    def createIndexGraph(self):
+        try:
+            for i in range(len(self.__addedSubjectsList) - 1):
+                for currSubjIndex in self.__addedSubjectsList[i].indexList:
+                    currSubjIndex.next = self.__addedSubjectsList[i+1].indexList
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::createIndexGraph()\nError msg: {err}')
+
+    # The algorithm to find the potential plans is simple
+    # From the indexGraph, do a DFS
+    # Only save the plans that have the same length as self.__addedSubjectList
+    # plan contains the list of possible index the user can take
+    def dfsMain(self):
+        try:
+            tempPlan = []
+            for tempIndex in self.__addedSubjectsList[0].indexList:
+                self.tempMarkDayTime(tempIndex)
+                tempPlan.append(tempIndex)
+                self.dfs(tempIndex, tempPlan)
+                tempPlan.remove(tempIndex)
+                self.unmarkDayTime(tempIndex)
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::dfsMain()\nError msg: {err}')
+
+    def dfs(self, tempIndex, tempPlan):
+        try:
+            if len(tempPlan) == len(self.__addedSubjectsList):
+                self.__potentialPlan.append(tempPlan.copy())
+            else:
+                for nextTempIndex in tempIndex.next:
+                    clash = False
+                    for nextTempIndexInfo in nextTempIndex.indexInfoList:
+                        if nextTempIndexInfo.indexInfoType == index.typeIndexInfoEnum.LAB:
+                            clash = self.gotClashForLab(self.getDayIndex(nextTempIndexInfo.day),
+                                                        self.getTimeRangeIndex(nextTempIndexInfo.time),
+                                                        nextTempIndexInfo.remarks)
+                            if clash:
+                                break
+                        else:
+                            clash = self.gotClash(self.getDayIndex(nextTempIndexInfo.day),
+                                                  self.getTimeRangeIndex(nextTempIndexInfo.time))
+                            if clash:
+                                break
+                    if not clash:
+                        self.tempMarkDayTime(nextTempIndex)
+                        tempPlan.append(nextTempIndex)
+                        self.dfs(nextTempIndex, tempPlan)
+                        tempPlan.remove(nextTempIndex)
+                        self.unmarkDayTime(nextTempIndex)
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::dfs()\nError msg: {err}')
+
+    # Check whether there is a clash when adding this specific index
+    def gotClashForLab(self, col, timeRange, remarks):
+        try:
+            for row in range(timeRange[0], timeRange[1]):
+                if not remarks and self.__dayTimeEvenOdd[row][col] != 'NIL':  # Some lab have no remarks so I assume it's all week
+                    return True
+                elif remarks == 'Even' and (
+                        self.__dayTimeEvenOdd[row][col] == 'A' or self.__dayTimeEvenOdd[row][col] == 'E' or
+                        self.__dayTimeEvenOdd[row][col] == 'EO'):
+                    return True
+                elif remarks == 'Odd' and (
+                        self.__dayTimeEvenOdd[row][col] == 'A' or self.__dayTimeEvenOdd[row][col] == 'O' or
+                        self.__dayTimeEvenOdd[row][col] == 'EO'):
+                    return True
+            return False
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::gotClashForLab()\nError msg: {err}')
+
+    # Check whether there's a general clash when adding this specific index
+    def gotClash(self, col, timeRange):
+        try:
+            for row in range(timeRange[0], timeRange[1]):
+                if self.__dayTime[row][col] == 1:
+                    return True
+            return False
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::gotClash()\nError msg: {err}')
+
+    # Temporarily mark the day time
+    def tempMarkDayTime(self, tempIndex):
+        try:
+            for tempIndexInfo in tempIndex.indexInfoList:
+                if tempIndexInfo.indexInfoType == index.typeIndexInfoEnum.LAB:
+                    self.tempMarkDayTimeForLab(self.getDayIndex(tempIndexInfo.day),
+                                               self.getTimeRangeIndex(tempIndexInfo.time), tempIndexInfo.remarks)
+                else:
+                    # For non-lab, i assume it is all week
+                    timeRange = self.getTimeRangeIndex(tempIndexInfo.time)
+                    for row in range(timeRange[0], timeRange[1]):
+                        self.__dayTime[row][self.getDayIndex(tempIndexInfo.day)] = 1
+                        self.__dayTimeEvenOdd[row][self.getDayIndex(tempIndexInfo.day)] = 'A'
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::tempMarkDayTime()\nError msg: {err}')
+
+    # Temporarily mark the day time for lab
+    def tempMarkDayTimeForLab(self, col, timeRange, remarks):
+        try:
+            for row in range(timeRange[0], timeRange[1]):
+                if self.__dayTime[row][col] == 0:
+                    self.__dayTime[row][col] = 1
+                    if remarks == 'Even':
+                        self.__dayTimeEvenOdd[row][col] = 'E'
+                    elif remarks == 'Odd':
+                        self.__dayTimeEvenOdd[row][col] = 'O'
+                    else:
+                        self.__dayTimeEvenOdd[row][col] = 'A'
+                else:
+                    # Something is occupying this time slot. So, check the evenOdd
+                    if (remarks == 'Even' and self.__dayTimeEvenOdd[row][col] == 'O') or (
+                            remarks == 'Odd' and self.__dayTimeEvenOdd[row][col] == 'E'):
+                        self.__dayTimeEvenOdd[row][col] = 'EO'
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::tempMarkDayTimeForLab()\nError msg: {err}')
+
+    # Unmark the temporary marked day time
+    def unmarkDayTime(self, tempIndex):
+        try:
+            for tempIndexInfo in tempIndex.indexInfoList:
+                if tempIndexInfo.indexInfoType == index.typeIndexInfoEnum.LAB:
+                    self.unmarkDayTimeForLab(self.getDayIndex(tempIndexInfo.day),
+                                             self.getTimeRangeIndex(tempIndexInfo.time), tempIndexInfo.remarks)
+                else:
+                    timeRange = self.getTimeRangeIndex(tempIndexInfo.time)
+                    for row in range(timeRange[0], timeRange[1]):
+                        self.__dayTime[row][self.getDayIndex(tempIndexInfo.day)] = 0
+                        self.__dayTimeEvenOdd[row][self.getDayIndex(tempIndexInfo.day)] = 'NIL'
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::unmarkDayTime()\nError msg: {err}')
+
+    # Unmark the temporary marked day time for lab
+    def unmarkDayTimeForLab(self, col, timeRange, remarks):
+        try:
+            for row in range(timeRange[0], timeRange[1]):
+                if remarks == 'Even' and self.__dayTimeEvenOdd[row][col] == 'EO':
+                    self.__dayTimeEvenOdd[row][col] = 'O'
+                elif remarks == 'Odd' and self.__dayTimeEvenOdd[row][col] == 'EO':
+                    self.__dayTimeEvenOdd[row][col] = 'E'
+                else:
+                    self.__dayTimeEvenOdd[row][col] = 'NIL'
+                    self.__dayTime[row][col] = 0
+        except Exception as err:
+            self.showErrorMsg(f'addRemoveSubjects(planWithFriends)::unmarkDayTimeForLab()\nError msg: {err}')
+
+    # Get the index based on the day
+    def getDayIndex(self, day):
+        return self.__dayDict.get(day)
+
+    # Get the range index based on the time
+    def getTimeRangeIndex(self, time):
+        return [self.__timeDict.get(time.split('-')[0]), self.__timeDict.get(time.split('-')[1])]
 
     # Reset the ui to its default state
     # Default state: empty nameLineEdit, courseYearComboBox is at index 0,
@@ -231,6 +412,7 @@ class Dialog(QDialog, addRemoveSubjectsDialog.Ui_AddRemoveSubject):
         self.nameLineEdit.clear()
         self.courseYearComboBox.setCurrentIndex(0)
         self.addedSubjectListWidget.clear()
+        self.__addedSubjectsList.clear()
         self.submitBtn.setEnabled(False)
 
     def showErrorMsg(self, errorMsg):

@@ -82,7 +82,7 @@ class Window(QMainWindow, window.Ui_MainWindow):
             self.overviewLbl.show()
             self.updateTable(newValue)
         except Exception as err:
-            self.show(f'MainWindow::onPlanValueChanged()\nError msg: {err}')
+            self.showErrorMsg(f'MainWindow::onPlanValueChanged()\nError msg: {err}')
 
     # Called everytime the app runs
     # Load the extensions
