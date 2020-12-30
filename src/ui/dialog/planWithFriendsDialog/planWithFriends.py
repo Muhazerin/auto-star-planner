@@ -56,15 +56,6 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
 
     # How the planWithFriends works:
     # 1: It adds new friend to friendList
-    # 2: The potentialPlan would have been done in the addRemoveSubjects(planWithFriend)
-    #    I need 2 copies of that. 1 to do the changing and another is for reset when user deletes other friend
-    # 3: Create a subjectList with a filtered indexList for that particular friend
-    #    and add it to self.__listOfFriendsSubjectListWithFilteredIndexList
-    # 4: Clear the self.__collatedToBeRemovedIndex
-    #    Collate all the "To be removed" index for every subject by checking which index
-    #    for that particular subject is not in everyone subject's indexList
-    # 5: After that, go through subject in the "Collated" subjectList, and remove the plans from everyone
-    #    potentialPlanList that have that index
 
     @pyqtSlot(friends.Friend, potentialPlan.PotentialPlan)
     def plan(self, newFriend, friendPotentialPlan):
@@ -76,16 +67,37 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
 
         # Collate the filtered index
         self.collateFilterIndex(self.__friendList[-1].name, self.__friendPotentialPlanList[-1])
+
+        # Fill the toBeRemoved dict based on the collatedSubjectListWithFilteredIndexList and collatedSubjectListWithCommonIndex
         for key in self.__collatedSubjectListWithFilteredIndexList:
             self.__toBeRemovedIndex[key] = self.__collatedSubjectListWithFilteredIndexList[key].symmetric_difference(self.__collatedSubjectListWithCommonIndex[key])
 
-        print(self.__toBeRemovedIndex)
+        # Remove user's plan that have those indexes
+        self.removePotentialPlan(self.__userPotentialPlan)
+        # Remove friends plan that have those indexes
+        for tempFriendPotentialPlan in self.__friendPotentialPlanList:
+            self.removePotentialPlan(tempFriendPotentialPlan)
 
-    def findIndexByName(self, name):
-        for i in range(len(self.__friendList)):
-            if self.__friendList[i].name == name:
-                return i
-        return -1
+        # Reflect the changes to mainWindow
+        self.__mainPotentialPlan.whoMadeTheChange = self.getWindowName()
+        self.__mainPotentialPlan.potentialPlan = self.__userPotentialPlan.potentialPlan
+        self.__mainPotentialPlan.subjectList = self.__userPotentialPlan.subjectList
+
+    def removePotentialPlan(self, potentialPlanInst):
+        for subjectIndex in range(len(potentialPlanInst.subjectList)):
+            # This contains the indexes to be removed for a specific subject
+            indexesToBeRemovedSet = self.__toBeRemovedIndex[potentialPlanInst.subjectList[subjectIndex].courseCode]
+            # This will contains the index in the potentialPlan that is to be removed later
+            tempPlanIndexToBeRemoved = set()
+            if indexesToBeRemovedSet:
+                # Get the index to be removed
+                for i in range(len(potentialPlanInst.potentialPlan)):
+                    if potentialPlanInst.potentialPlan[i][subjectIndex].indexNo in indexesToBeRemovedSet:
+                        tempPlanIndexToBeRemoved.add(i)
+
+                sortedTempPlanIndexToBeRemoved = sorted(tempPlanIndexToBeRemoved, reverse=True)
+                for i in sortedTempPlanIndexToBeRemoved:
+                    potentialPlanInst.potentialPlan.pop(i)
 
     # Called everytime the selected row in the friendListWidget changes
     # Enable the viewFriendPlanBtn and deleteFriendBtn
