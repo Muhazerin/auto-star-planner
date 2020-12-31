@@ -5,6 +5,9 @@ from model import potentialPlan
 from PyQt5.QtWidgets import (QDialog, QMessageBox)
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal)
 
+# TODO: Do the algorithm for delete friend button
+# TODO: Error handling
+
 class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
     viewFriendPlan = pyqtSignal(friends.Friend, potentialPlanCopy.PotentialPlanCopy)
     def __init__(self, mainPotentialPlan):
@@ -26,9 +29,6 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
             self.__collatedSubjectListWithFilteredIndexList = {}    # "course code": "set of indexes"
             self.__collatedSubjectListWithCommonIndex = {}
             self.__toBeRemovedIndex = {}
-
-            # To find who has common subjects together --> "course code": "['user', 'friend#1 name', 'friend#2 name']"
-            self.__subjectOccurence = {}
 
             self.__friendList = []
             self.__addRemoveSubjectsDialog = addRemoveSubjects.Dialog()
@@ -55,30 +55,33 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
             self.showErrorMsg(f'planWithFriends::addFriendBtnClicked()\nError msg: {err}')
 
     # How the planWithFriends works:
-    # 1: It adds new friend to friendList
+    # 1: It adds new friend to friendList and the potentialPlanInst to friendPotentialPlanList and friendPotentialPlanListCopy
+    # 2: Collate the filtered index and common index
+    # 3: Fill the toBeRemoved dict based on 2
+    # 4: Filter user's and friends plan based on 4
+    # 5: Reflect the changes for user to mainWindow
 
     @pyqtSlot(friends.Friend, potentialPlan.PotentialPlan)
     def plan(self, newFriend, friendPotentialPlan):
-        # Add newFriend to friendList
+        # Step 1
         self.__friendList.append(newFriend)
         self.__friendPotentialPlanList.append(potentialPlanCopy.PotentialPlanCopy(friendPotentialPlan))
         self.__friendPotentialPlanListCopy.append(potentialPlanCopy.PotentialPlanCopy(friendPotentialPlan))
         self.friendListWidget.addItem(newFriend.name)
 
-        # Collate the filtered index
+        # Step 2
         self.collateFilterIndex(self.__friendList[-1].name, self.__friendPotentialPlanList[-1])
 
-        # Fill the toBeRemoved dict based on the collatedSubjectListWithFilteredIndexList and collatedSubjectListWithCommonIndex
+        # Step 3
         for key in self.__collatedSubjectListWithFilteredIndexList:
             self.__toBeRemovedIndex[key] = self.__collatedSubjectListWithFilteredIndexList[key].symmetric_difference(self.__collatedSubjectListWithCommonIndex[key])
 
-        # Remove user's plan that have those indexes
+        # Step 4
         self.removePotentialPlan(self.__userPotentialPlan)
-        # Remove friends plan that have those indexes
         for tempFriendPotentialPlan in self.__friendPotentialPlanList:
             self.removePotentialPlan(tempFriendPotentialPlan)
 
-        # Reflect the changes to mainWindow
+        # Step 5
         self.__mainPotentialPlan.whoMadeTheChange = self.getWindowName()
         self.__mainPotentialPlan.potentialPlan = self.__userPotentialPlan.potentialPlan
         self.__mainPotentialPlan.subjectList = self.__userPotentialPlan.subjectList
@@ -134,13 +137,11 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
                     tempSet.add(tempPotentialPlan.potentialPlan[i][j].indexNo)
 
                 if tempPotentialPlan.subjectList[j].courseCode in self.__collatedSubjectListWithFilteredIndexList:
-                    self.__subjectOccurence[tempPotentialPlan.subjectList[j].courseCode].append(name)
                     tempResult = self.__collatedSubjectListWithFilteredIndexList[tempPotentialPlan.subjectList[j].courseCode].union(tempSet)
                     self.__collatedSubjectListWithFilteredIndexList[tempPotentialPlan.subjectList[j].courseCode] = tempResult
                     tempResult = self.__collatedSubjectListWithCommonIndex[tempPotentialPlan.subjectList[j].courseCode].intersection(tempSet)
                     self.__collatedSubjectListWithCommonIndex[tempPotentialPlan.subjectList[j].courseCode] = tempResult
                 else:
-                    self.__subjectOccurence[tempPotentialPlan.subjectList[j].courseCode] = [name]
                     self.__collatedSubjectListWithFilteredIndexList[tempPotentialPlan.subjectList[j].courseCode] = tempSet
                     self.__collatedSubjectListWithCommonIndex[tempPotentialPlan.subjectList[j].courseCode] = tempSet
         except Exception as err:
@@ -157,7 +158,6 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
                 self.__friendPotentialPlanListCopy.clear()
                 self.__collatedSubjectListWithFilteredIndexList.clear()
                 self.__toBeRemovedIndex.clear()
-                self.__subjectOccurence.clear()
                 self.friendListWidget.clear()
                 self.viewFriendPlanBtn.setEnabled(False)
                 self.deleteFriendBtn.setEnabled(False)

@@ -8,14 +8,13 @@ class Dialog(QDialog, filterSubjectsDialog.Ui_filterSubjectsDialog):
         try:
             super(Dialog, self).__init__()
 
-            # This is the class i used to talk back to mainwindow via observer pattern
+            # This is the variable i used to talk back to mainwindow via observer pattern
             self.__mainPotentialPlan = mainPotentialPlan
 
             # This is a copy of the mainPotentialPlan, for the apply filter and clear filter
             self.__mainPotentialPlanCopy = None
 
             self.__comboBoxList = []
-            self.__tempFilteredPlan = []
             self.setupUi(self)
             self.applyFilterBtn.clicked.connect(self.applyFilterBtnClicked)
             self.clearFilterBtn.clicked.connect(self.clearFilterBtnClicked)
@@ -49,6 +48,7 @@ class Dialog(QDialog, filterSubjectsDialog.Ui_filterSubjectsDialog):
                 return
 
             # If there is no filter applied and the user pressed the apply button
+            # This action is equivalent to clearing the filter
             if not gotFilter:
                 tempPlanList = self.__mainPotentialPlanCopy.potentialPlan
                 self.clearFilterBtn.setEnabled(False)
@@ -98,11 +98,11 @@ class Dialog(QDialog, filterSubjectsDialog.Ui_filterSubjectsDialog):
             self.showErrorMsg(f'filterSubjects::clearFilterBtnClicked()\nError msg: {err}')
 
     # Called everytime there's changes to mainPotentialPlan
-    # However, this dialog only cares when Add/Remove Subjects make the changes
+    # However, this dialog only cares when Add/Remove Subjects or Plan With Friends make the changes
     # Tries to show the appropriate ui(comboBox) based on the plan
     def updatePlan(self):
         try:
-            if self.__mainPotentialPlan.whoMadeTheChange == 'Add/Remove Subjects':
+            if self.__mainPotentialPlan.whoMadeTheChange == 'Add/Remove Subjects' or self.__mainPotentialPlan.whoMadeTheChange == 'Plan with Friends':
                 self.setEnabled(True)
                 self.resetUi()
                 self.__mainPotentialPlanCopy = potentialPlanCopy.PotentialPlanCopy(self.__mainPotentialPlan)
