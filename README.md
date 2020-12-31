@@ -15,6 +15,9 @@ If loaded successfully, the modules will appear in the "Extension" tab
   
 * [Filter Subjects](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/filterSubjectsDialog)  
     * This module enables the user to filter each subjects to a specific index
+    
+* [Plan with Friends](https://github.com/Muhazerin/auto-star-planner/tree/main/src/ui/dialog/planWithFriendsDialog)
+    * This module allows the user to add in their friend's plan and filter the common indexes
 ### Tips for creating new module
 The module are to be created with pyqt  
 1. Place your exampleModule.py inside exampleModuleDialog folder
