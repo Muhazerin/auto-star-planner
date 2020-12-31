@@ -1,5 +1,5 @@
 # Auto Star Planner
-Why take 1 hour to plan your semester when someone took more than 1 week to automate that task for you  
+Why take 1 hour to plan your semester when someone took 1 month to automate that task for you  
 ![](https://img.shields.io/badge/platform-Windows%2010-blue) ![](https://img.shields.io/badge/language-Python%203-yellow)
 ![](https://i.imgur.com/iBGLqNN.gif)
 
