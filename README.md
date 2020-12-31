@@ -32,8 +32,7 @@ The module are to be created with pyqt
 
 After installing python, install these packages
 ```
-pip install pyqt5  
-pip install beautifulsoup4
+pip install -r requirements.txt
 ```
 
 ## Source Code
