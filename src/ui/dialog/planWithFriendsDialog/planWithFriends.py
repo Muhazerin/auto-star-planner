@@ -5,7 +5,6 @@ from model import potentialPlan
 from PyQt5.QtWidgets import (QDialog, QMessageBox)
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal)
 
-# TODO: Do the algorithm for delete friend button
 # TODO: Error handling
 
 class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
@@ -15,6 +14,7 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
             super(Dialog, self).__init__()
             # This is to reflect the changes to mainwindow
             self.__mainPotentialPlan = mainPotentialPlan
+
             # This is to hold the user's potential plan
             # I need 2 copies. 1 to do the changing and 1 to reset when user delete other friends
             self.__userPotentialPlan = None
@@ -26,8 +26,11 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
 
             # To do the filtering via the common subjects
             # Will eventually hold the indexes to be removed for each subjects
+            # Each subject contains all the available indexes
             self.__collatedSubjectListWithFilteredIndexList = {}    # "course code": "set of indexes"
+            # Each subject contains the common indexes among everyone
             self.__collatedSubjectListWithCommonIndex = {}
+            # Each subject contains the indexes to be removed
             self.__toBeRemovedIndex = {}
 
             self.__friendList = []
@@ -41,6 +44,7 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
             self.friendListWidget.currentRowChanged.connect(self.friendListWidgetRowChanged)
             self.viewFriendPlanBtn.clicked.connect(self.viewFriendPlanBtnClicked)
             self.viewFriendPlan.connect(self.__friendPlannerDialog.viewFriendPlanEmitted)
+            self.deleteFriendBtn.clicked.connect(self.deleteFriendBtnClicked)
         except Exception as err:
             self.showErrorMsg(f'planWithFriends::__init__():\nError msg: {err}')
 
@@ -82,9 +86,7 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
             self.removePotentialPlan(tempFriendPotentialPlan)
 
         # Step 5
-        self.__mainPotentialPlan.whoMadeTheChange = self.getWindowName()
-        self.__mainPotentialPlan.potentialPlan = self.__userPotentialPlan.potentialPlan
-        self.__mainPotentialPlan.subjectList = self.__userPotentialPlan.subjectList
+        self.reflectTheChanges()
 
     def removePotentialPlan(self, potentialPlanInst):
         for subjectIndex in range(len(potentialPlanInst.subjectList)):
@@ -129,6 +131,57 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
         except Exception as err:
             self.showErrorMsg(f'planWithFriends::viewFriendPlanBtnClicked()\nError msg: {err}')
 
+    # Called everytime the user clicks the deleteFriendBtn
+    @pyqtSlot()
+    def deleteFriendBtnClicked(self):
+        try:
+            # Pop the item from friendList, friendPotentialPlanList, and friendPotentialPlanListCopy
+            self.__friendList.pop(self.friendListWidget.currentRow())
+            self.__friendPotentialPlanList.pop(self.friendListWidget.currentRow())
+            self.__friendPotentialPlanListCopy.pop(self.friendListWidget.currentRow())
+
+            # Remove the friend from the friendListWidget adn clear the selection
+            self.friendListWidget.takeItem(self.friendListWidget.currentRow())
+            self.friendListWidget.setCurrentRow(-1)
+
+            # Reset the collatedLists and toBeRemovedIndex
+            self.__collatedSubjectListWithFilteredIndexList.clear()
+            self.__collatedSubjectListWithCommonIndex.clear()
+            self.__toBeRemovedIndex.clear()
+
+            # Reset userPotentialPlan and collatedLists
+            self.__userPotentialPlan = potentialPlanCopy.PotentialPlanCopy(self.__userPotentialPlanCopy)
+            self.collateFilterIndex('user', self.__userPotentialPlan)
+
+            # Based on the friendList, do Step 2, 3, and 4
+            if self.__friendList:
+                # Redo the collateFilterIndex for every friend
+                for i in range(len(self.__friendPotentialPlanList)):
+                    self.__friendPotentialPlanList[i] = potentialPlanCopy.PotentialPlanCopy(self.__friendPotentialPlanListCopy[i])
+                    self.collateFilterIndex(self.__friendList[i].name, self.__friendPotentialPlanList[i])
+
+                # Step 3 in the plan()
+                for key in self.__collatedSubjectListWithFilteredIndexList:
+                    self.__toBeRemovedIndex[key] = self.__collatedSubjectListWithFilteredIndexList[key].symmetric_difference(self.__collatedSubjectListWithCommonIndex[key])
+
+                # Step 4
+                self.removePotentialPlan(self.__userPotentialPlan)
+                for tempFriendPotentialPlan in self.__friendPotentialPlanList:
+                    self.removePotentialPlan(tempFriendPotentialPlan)
+
+            # Reflect the changes in userPotentialPlan to mainWindow
+            self.reflectTheChanges()
+        except Exception as err:
+            self.showErrorMsg(f'planWithFriends::deleteFriendBtnClicked()\nError msg: {err}')
+
+    def reflectTheChanges(self):
+        try:
+            self.__mainPotentialPlan.whoMadeTheChange = self.getWindowName()
+            self.__mainPotentialPlan.potentialPlan = self.__userPotentialPlan.potentialPlan
+            self.__mainPotentialPlan.subjectList = self.__userPotentialPlan.subjectList
+        except Exception as err:
+            self.showErrorMsg(f'planWithFriends::reflectTheChanges()\nError msg: {err}')
+
     def collateFilterIndex(self, name, tempPotentialPlan):
         try:
             for j in range(len(tempPotentialPlan.subjectList)):
@@ -157,6 +210,7 @@ class Dialog(QDialog, planWithFriendsDialog.Ui_planWithFriendsDialog):
                 self.__friendPotentialPlanList.clear()
                 self.__friendPotentialPlanListCopy.clear()
                 self.__collatedSubjectListWithFilteredIndexList.clear()
+                self.__collatedSubjectListWithCommonIndex.clear()
                 self.__toBeRemovedIndex.clear()
                 self.friendListWidget.clear()
                 self.viewFriendPlanBtn.setEnabled(False)
