@@ -20,7 +20,7 @@
    <string>Auto STAR Planner</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../res/resources.qrc">
+   <iconset resource="src/ui/res/resources.qrc">
     <normaloff>:/planner.png</normaloff>:/planner.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -303,7 +303,7 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="../res/resources.qrc"/>
+  <include location="src/ui/res/resources.qrc"/>
  </resources>
  <connections/>
 </ui>
