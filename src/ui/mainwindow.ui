@@ -19,10 +19,6 @@
   <property name="windowTitle">
    <string>Auto STAR Planner</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="src/ui/res/resources.qrc">
-    <normaloff>:/planner.png</normaloff>:/planner.png</iconset>
-  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
@@ -299,11 +295,27 @@
      <height>18</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuLoad_from_website">
+    <property name="title">
+     <string>Load Courses</string>
+    </property>
+    <addaction name="actionFrom_Website"/>
+    <addaction name="actionFrom_Disk"/>
+   </widget>
+   <addaction name="menuLoad_from_website"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionFrom_Website">
+   <property name="text">
+    <string>From Website</string>
+   </property>
+  </action>
+  <action name="actionFrom_Disk">
+   <property name="text">
+    <string>From Disk</string>
+   </property>
+  </action>
  </widget>
- <resources>
-  <include location="src/ui/res/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
