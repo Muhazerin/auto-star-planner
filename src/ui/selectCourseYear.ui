@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>175</width>
-    <height>76</height>
+    <width>588</width>
+    <height>248</height>
    </rect>
   </property>
   <property name="font">
@@ -17,34 +17,47 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Academic Semester Selection</string>
+   <string>Course Year Selection</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Please select an academic semester</string>
+      <string>Please select a course year</string>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="hlAcadSem">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="lblAcadSem">
+      <widget class="QLabel" name="lblCourseYear">
        <property name="text">
-        <string>Academic Semester:</string>
+        <string>Course Year:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBoxAcadSem"/>
+      <widget class="QListWidget" name="qlistCourseYear">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>512</width>
+         <height>384</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="hlBtn">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <spacer name="hs">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -55,6 +68,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnBack">
+       <property name="text">
+        <string>Back</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnNext">

@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(170, 76)
+        Dialog.resize(175, 76)
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)
@@ -47,7 +47,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Academic Semester"))
+        Dialog.setWindowTitle(_translate("Dialog", "Academic Semester Selection"))
         self.label_2.setText(_translate("Dialog", "Please select an academic semester"))
         self.lblAcadSem.setText(_translate("Dialog", "Academic Semester:"))
         self.btnNext.setText(_translate("Dialog", "Next"))
