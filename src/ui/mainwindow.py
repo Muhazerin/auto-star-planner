@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'window.ui'
+# Form implementation generated from reading ui file '.\mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -19,9 +19,6 @@ class Ui_MainWindow(object):
         font.setFamily("Arial")
         font.setPointSize(10)
         MainWindow.setFont(font)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/planner.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -138,10 +135,19 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1564, 18))
         self.menubar.setObjectName("menubar")
+        self.menuLoad_from_website = QtWidgets.QMenu(self.menubar)
+        self.menuLoad_from_website.setObjectName("menuLoad_from_website")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.actionFrom_Website = QtWidgets.QAction(MainWindow)
+        self.actionFrom_Website.setObjectName("actionFrom_Website")
+        self.actionFrom_Disk = QtWidgets.QAction(MainWindow)
+        self.actionFrom_Disk.setObjectName("actionFrom_Disk")
+        self.menuLoad_from_website.addAction(self.actionFrom_Website)
+        self.menuLoad_from_website.addAction(self.actionFrom_Disk)
+        self.menubar.addAction(self.menuLoad_from_website.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -227,4 +233,6 @@ class Ui_MainWindow(object):
         self.planLbl.setText(_translate("MainWindow", "Plan"))
         self.ofLbl.setText(_translate("MainWindow", "of"))
         self.totalPlanLbl.setText(_translate("MainWindow", "0"))
-import ui.res.resources_rc
+        self.menuLoad_from_website.setTitle(_translate("MainWindow", "Load Courses"))
+        self.actionFrom_Website.setText(_translate("MainWindow", "From Website"))
+        self.actionFrom_Disk.setText(_translate("MainWindow", "From Disk"))

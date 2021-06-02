@@ -1,4 +1,10 @@
-from ui.mainwindow import mainwindow
+import sys
+from PyQt5.QtWidgets import QApplication
 
-if __name__ == "__main__":
-    mainwindow.main()
+from autoStarPlanner import AutoStarPlanner
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    mainwindow =AutoStarPlanner()
+    mainwindow.show()
+    sys.exit(app.exec())
