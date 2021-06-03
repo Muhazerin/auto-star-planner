@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSlot
 
 from ui import selectAcadSem
 from datasource import source
-from selectCourseYear import CourseYearDialog
+from selectModulesDialog import SelectModulesDialog
 
 
 class SelectAcadSemDialog(QDialog, selectAcadSem.Ui_Dialog):
@@ -11,10 +11,10 @@ class SelectAcadSemDialog(QDialog, selectAcadSem.Ui_Dialog):
         super(SelectAcadSemDialog, self).__init__()
         self.setupUi(self)
 
-        self.__course_year_dialog = CourseYearDialog()
+        self.__select_module_dialog = SelectModulesDialog()
 
-        self.btnNext.clicked.connect(self.btnNextClicked)
-        self.btnNext.clicked.connect(self.__course_year_dialog.run)
+        self.btnNext.clicked.connect(self.btnNext_clicked)
+        self.btnNext.clicked.connect(self.__select_module_dialog.run)
 
     # Checks if able to load acad sem before executing this dialog box
     @pyqtSlot()
@@ -30,7 +30,7 @@ class SelectAcadSemDialog(QDialog, selectAcadSem.Ui_Dialog):
 
     # Checks if chosen_acad_sem is different and load_course_year from NTU website
     @pyqtSlot()
-    def btnNextClicked(self):
+    def btnNext_clicked(self):
         if source.chosen_acad_sem != self.comboBoxAcadSem.currentText():
             source.chosen_acad_sem = self.comboBoxAcadSem.currentText()
             source.load_course_year(

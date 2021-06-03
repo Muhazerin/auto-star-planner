@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 from ui import mainwindow
 
-from selectAcadSem import SelectAcadSemDialog
+from selectAcadSemDialog import SelectAcadSemDialog
 
 
 class AutoStarPlanner(QMainWindow, mainwindow.Ui_MainWindow):
