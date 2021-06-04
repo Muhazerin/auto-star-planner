@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import Qt
+import copy
 
 from ui import selectModules
 from datasource import source
@@ -9,9 +11,12 @@ class SelectModulesDialog(QDialog, selectModules.Ui_Dialog):
     def __init__(self):
         super(SelectModulesDialog, self).__init__()
         self.setupUi(self)
+        self.__selected_modules = []
+        self.__selected_indexes = []
 
         self.btnBack.clicked.connect(self.close)
         self.comboBoxCourseYear.currentIndexChanged.connect(self.comboBoxCourseYear_currentIndexChanged)
+        self.btnAdd.clicked.connect(self.btnAdd_clicked)
 
     # Checks if course_year_key and course_year_value is valid and tries to execute the dialog box
     @pyqtSlot()
@@ -51,3 +56,18 @@ class SelectModulesDialog(QDialog, selectModules.Ui_Dialog):
             else:
                 QMessageBox.critical(self, self.windowTitle(),
                                      f'Unable to get the modules from NTU Website\n{source.modules}')
+
+    # Function to run when btnAdd is clicked
+    @pyqtSlot()
+    def btnAdd_clicked(self):
+        # Check if user has selected an item in qListModuleList and that item is not inside qListSelectedModules
+        if self.qListModuleList.currentRow() > -1 and \
+                len(self.qListSelectedModules.findItems(source.modules[self.qListModuleList.currentRow()],
+                                                        Qt.MatchExactly)) < 1:
+            # Add the item in qListSelectedModules
+            self.qListSelectedModules.addItem(source.modules[self.qListModuleList.currentRow()])
+            # Create a copy of the module and index info and store it in the respective "selected" list
+            self.__selected_modules.append(copy.copy(source.modules[self.qListModuleList.currentRow()]))
+            self.__selected_indexes.append(copy.copy(source.indexes[self.qListModuleList.currentRow()]))
+        # Clear the selection in qListModuleList
+        self.qListModuleList.setCurrentRow(-1)

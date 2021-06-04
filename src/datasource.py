@@ -1,6 +1,7 @@
 import requests
 import re
 from bs4 import BeautifulSoup
+import indexParser
 
 
 class DataSource:
@@ -122,51 +123,27 @@ class DataSource:
                     # Append the information to self.__modules
                     self.__modules.append(f'{fonts[0].string}: {course_name}')
                 # Course timetable info section
+                # Initialize the indexes list
+                self.__indexes = []
                 for i in range(1, len(tables) + 1, 2):
                     # Split the info into indexes
                     self.retrieve_indexes(tables[i])
-
         except Exception as err:
             self.__modules = f'DataSource load_modules Exception Error\nError msg: {err}'
 
     # Split the info into indexes
     def retrieve_indexes(self, table):
-        self.__indexes = []
         # Get all the rows in the table
         trs = table.find_all('tr')
         for i in range(1, len(trs)):
-            self.__indexes.append({})
             # Get all the columns in a row. There are exactly 7 columns
             tds = trs[i].find_all('td')
-            # Parse the respective columns
-            self.parse_index(tds[0])
-            self.parse_type(tds[1])
-            self.parse_group(tds[2])
-            self.parse_day(tds[3])
-            self.parse_time(tds[4])
-            self.parse_venue(tds[5])
-            self.parse_remark(tds[6])
-
-    def parse_index(self, td):
-        pass
-
-    def parse_type(self, td):
-        pass
-
-    def parse_group(self, td):
-        pass
-
-    def parse_day(self, td):
-        pass
-
-    def parse_time(self, td):
-        pass
-
-    def parse_venue(self, td):
-        pass
-
-    def parse_remark(self, td):
-        pass
+            # If first column is a string, increment index and add dict to list and parse
+            if tds[0].string:
+                self.__indexes.append({})
+                indexParser.parse_new(tds, len(self.__indexes) - 1, self.__indexes)
+            else:
+                indexParser.parse(tds, len(self.__indexes) - 1, self.__indexes)
 
 
 source = DataSource()
