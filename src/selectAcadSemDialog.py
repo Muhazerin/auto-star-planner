@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog, QMessageBox
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
 from ui import selectAcadSem
 from datasource import source
@@ -7,6 +7,8 @@ from selectModulesDialog import SelectModulesDialog
 
 
 class SelectAcadSemDialog(QDialog, selectAcadSem.Ui_Dialog):
+    signal_save_and_load = pyqtSignal()
+
     def __init__(self):
         super(SelectAcadSemDialog, self).__init__()
         self.setupUi(self)
@@ -15,12 +17,16 @@ class SelectAcadSemDialog(QDialog, selectAcadSem.Ui_Dialog):
 
         self.btnNext.clicked.connect(self.btnNext_clicked)
         self.btnNext.clicked.connect(self.__select_module_dialog.run)
+        self.__select_module_dialog.signal_save_and_load.connect(self.signal_save_and_load)
+        self.__select_module_dialog.signal_save_and_load.connect(self.close)
 
     # Checks if able to load acad sem before executing this dialog box
     @pyqtSlot()
     def run(self):
+        # Load acad sem if acad_sem_dict is not valid
         if not source.acad_sem_dict:
             source.load_acad_sem()
+        # Loaded successfully if acad_sem_dict is a dict
         if type(source.acad_sem_dict) is dict:
             self.comboBoxAcadSem.addItems(source.acad_sem_dict.values())
             self.exec()

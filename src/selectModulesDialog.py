@@ -1,22 +1,28 @@
 from PyQt5.QtWidgets import QDialog, QMessageBox
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtCore import Qt
 import copy
 
 from ui import selectModules
 from datasource import source
+from jsonSaver import JsonSaver
 
 
 class SelectModulesDialog(QDialog, selectModules.Ui_Dialog):
+    signal_save_and_load = pyqtSignal()
+
     def __init__(self):
         super(SelectModulesDialog, self).__init__()
         self.setupUi(self)
         self.__selected_modules = []
         self.__selected_indexes = []
+        self.__saver = JsonSaver(self.__selected_modules, self.__selected_indexes)
 
         self.btnBack.clicked.connect(self.close)
         self.comboBoxCourseYear.currentIndexChanged.connect(self.comboBoxCourseYear_currentIndexChanged)
         self.btnAdd.clicked.connect(self.btnAdd_clicked)
+        self.btnRemove.clicked.connect(self.btnRemove_clicked)
+        self.btnSave.clicked.connect(self.btnSave_clicked)
 
     # Checks if course_year_key and course_year_value is valid and tries to execute the dialog box
     @pyqtSlot()
@@ -71,3 +77,33 @@ class SelectModulesDialog(QDialog, selectModules.Ui_Dialog):
             self.__selected_indexes.append(copy.copy(source.indexes[self.qListModuleList.currentRow()]))
         # Clear the selection in qListModuleList
         self.qListModuleList.setCurrentRow(-1)
+        # Enable btnSave if there're more than 1 item in qListModules
+        if self.qListSelectedModules.count() > 0:
+            self.btnSave.setEnabled(True)
+
+    # Function to run when btnRemove is clicked
+    @pyqtSlot()
+    def btnRemove_clicked(self):
+        # Check if user has selected an item in qListSelectedModules
+        if self.qListSelectedModules.currentRow() > -1:
+            # Remove the module from selected module list
+            self.__selected_modules.pop(self.qListSelectedModules.currentRow())
+            # Remove the index from selected index list
+            self.__selected_indexes.pop(self.qListSelectedModules.currentRow())
+            # Remove the item from qListSelectedModules
+            self.qListSelectedModules.takeItem(self.qListSelectedModules.currentRow())
+        # Clear the selection in qListSelectedModules
+        self.qListSelectedModules.setCurrentRow(-1)
+        # Disable btnSave if there is no item in qListSelectedModules
+        if self.qListSelectedModules.count() == 0:
+            self.btnSave.setEnabled(False)
+
+    # Function to run when btnSave is clicked
+    @pyqtSlot()
+    def btnSave_clicked(self):
+        # Save the data to saver's specification
+        self.__saver.save()
+        # Emit this signal which propagates to AutoStarPlanner class
+        self.signal_save_and_load.emit()
+        # Close this dialog
+        self.close()

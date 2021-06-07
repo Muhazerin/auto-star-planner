@@ -11,7 +11,7 @@ class DataSource:
         self.__course_year_value = None     # List
         self.__course_year_key = None       # List
         self.__modules = None               # List
-        self.__indexes = None               # List of dict --> [{}, {}, {}]
+        self.__indexes = None               # List of list of dict --> [[{}, {}, {}], [{}, {}]]
 
     @property
     def acad_sem_dict(self):
@@ -133,6 +133,9 @@ class DataSource:
 
     # Split the info into indexes
     def retrieve_indexes(self, table):
+        # Append a new list to self.__indexes
+        self.__indexes.append([])
+        current_list = self.__indexes[len(self.__indexes) - 1]
         # Get all the rows in the table
         trs = table.find_all('tr')
         for i in range(1, len(trs)):
@@ -140,10 +143,10 @@ class DataSource:
             tds = trs[i].find_all('td')
             # If first column is a string, increment index and add dict to list and parse
             if tds[0].string:
-                self.__indexes.append({})
-                indexParser.parse_new(tds, len(self.__indexes) - 1, self.__indexes)
+                current_list.append({})
+                indexParser.parse_new(tds, len(current_list) - 1, current_list)
             else:
-                indexParser.parse(tds, len(self.__indexes) - 1, self.__indexes)
+                indexParser.parse(tds, len(current_list) - 1, current_list)
 
 
 source = DataSource()

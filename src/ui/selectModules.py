@@ -90,4 +90,4 @@ class Ui_Dialog(object):
         self.btnRemove.setText(_translate("Dialog", "Remove"))
         self.label_3.setText(_translate("Dialog", "Selected Modules"))
         self.btnBack.setText(_translate("Dialog", "Back"))
-        self.btnSave.setText(_translate("Dialog", "Save"))
+        self.btnSave.setText(_translate("Dialog", "Save and Load"))
