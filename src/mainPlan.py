@@ -2,9 +2,7 @@
 class MainPlan:
     def __init__(self):
         self.__modules_list = []
-        self.__indexes_list = []
-        self.__modules_changed = False
-        self.__indexes_changed = False
+        self.__index_node_list = []
         self.__observers_list = []
 
     @property
@@ -15,25 +13,16 @@ class MainPlan:
     @modules_list.setter
     def modules_list(self, new_modules_list):
         self.__modules_list = new_modules_list
-        self.__modules_changed = True
-        if self.__indexes_changed:
-            self.__modules_changed = False
-            self.__indexes_changed = False
-            self.notify()
 
     @property
-    def indexes_list(self):
-        return self.__indexes_list
+    def index_node_list(self):
+        return self.__index_node_list
 
     # Whenever both modules and indexes list changed, notify the observers to update
-    @indexes_list.setter
-    def indexes_list(self, new_indexes_list):
-        self.__indexes_list = new_indexes_list
-        self.__indexes_changed = True
-        if self.__modules_changed:
-            self.__modules_changed = False
-            self.__indexes_changed = False
-            self.notify()
+    @index_node_list.setter
+    def index_node_list(self, new_index_node_list):
+        self.__index_node_list = new_index_node_list
+        self.notify()
 
     # Add the observer to observers_list
     def attach(self, observer):
@@ -42,4 +31,4 @@ class MainPlan:
     # Notify the observers in observers_list to update whenever there's changes to modules and indexes list
     def notify(self):
         for observer in self.__observers_list:
-            observer.update(self.__modules_list, self.__indexes_list)
+            observer.update(self.__modules_list, self.__index_node_list)

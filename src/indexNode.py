@@ -52,7 +52,7 @@ class IndexNode:
     def index_node_list(self):
         return self.__index_node_list
 
-    @info.setter
+    @index_node_list.setter
     def index_node_list(self, new_index_node_list):
         self.__index_node_list = new_index_node_list
 

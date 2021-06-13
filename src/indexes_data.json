@@ -108,6 +108,29 @@
   ],
   [
     {
+      "index": "10411",
+      "info": [
+        {
+          "TYPE": "LEC/STUDIO",
+          "GROUP": "SC4",
+          "DAY": "THU",
+          "TIME": "0930-1120",
+          "VENUE": "ONLINE",
+          "REMARK": null
+        },
+        {
+          "TYPE": "TUT",
+          "GROUP": "SC4",
+          "DAY": "WED",
+          "TIME": "1230-1320",
+          "VENUE": "ONLINE",
+          "REMARK": null
+        }
+      ]
+    }
+  ],
+  [
+    {
       "index": "10414",
       "info": [
         {
@@ -131,23 +154,132 @@
   ],
   [
     {
-      "index": "10415",
+      "index": "10470",
       "info": [
         {
-          "TYPE": "LEC/STUDIO",
-          "GROUP": "SC4",
+          "TYPE": "TUT",
+          "GROUP": "SCE1",
           "DAY": "WED",
-          "TIME": "0930-1120",
-          "VENUE": "ONLINE",
-          "REMARK": null
-        },
+          "TIME": "1530-1720",
+          "VENUE": "TR+23",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10471",
+      "info": [
         {
           "TYPE": "TUT",
-          "GROUP": "SC4",
+          "GROUP": "SCE2",
           "DAY": "MON",
-          "TIME": "0830-0920",
-          "VENUE": "ONLINE",
-          "REMARK": null
+          "TIME": "1430-1620",
+          "VENUE": "TR+16",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10472",
+      "info": [
+        {
+          "TYPE": "TUT",
+          "GROUP": "SCE3",
+          "DAY": "FRI",
+          "TIME": "1430-1620",
+          "VENUE": "TR+19",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10473",
+      "info": [
+        {
+          "TYPE": "TUT",
+          "GROUP": "SCE4",
+          "DAY": "WED",
+          "TIME": "1030-1220",
+          "VENUE": "TR+37",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10474",
+      "info": [
+        {
+          "TYPE": "TUT",
+          "GROUP": "SCE5",
+          "DAY": "FRI",
+          "TIME": "1130-1320",
+          "VENUE": "LHN-TR+16",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10475",
+      "info": [
+        {
+          "TYPE": "TUT",
+          "GROUP": "SCE6",
+          "DAY": "THU",
+          "TIME": "0830-1020",
+          "VENUE": "CSKL9",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10476",
+      "info": [
+        {
+          "TYPE": "TUT",
+          "GROUP": "SCE7",
+          "DAY": "THU",
+          "TIME": "1430-1620",
+          "VENUE": "TR+37",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10477",
+      "info": [
+        {
+          "TYPE": "TUT",
+          "GROUP": "SCE8",
+          "DAY": "MON",
+          "TIME": "0830-1020",
+          "VENUE": "LHN-TR+18",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10478",
+      "info": [
+        {
+          "TYPE": "TUT",
+          "GROUP": "SCE9",
+          "DAY": "THU",
+          "TIME": "1230-1420",
+          "VENUE": "LHN-TR+18",
+          "REMARK": "Teaching Wk2-13"
+        }
+      ]
+    },
+    {
+      "index": "10479",
+      "info": [
+        {
+          "TYPE": "TUT",
+          "GROUP": "SCE10",
+          "DAY": "MON",
+          "TIME": "1030-1220",
+          "VENUE": "LHN-TR+18",
+          "REMARK": "Teaching Wk2-13"
         }
       ]
     }
